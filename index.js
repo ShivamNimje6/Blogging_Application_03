@@ -28,7 +28,14 @@ const connectDB = async () => {
 dotenv.config();
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "/images")));
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// Set up CORS
+const corsOptions = {
+  origin:
+    "https://blogging-application-f5wlzqejd-shivam-nimjes-projects.vercel.app",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use("/api/auth", authRoute);

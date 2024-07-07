@@ -1,10 +1,9 @@
+// backend/routes/posts.js
+
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
-const bcrypt = require("bcrypt");
-const Post = require("../models/Post");
-const Comment = require("../models/Comment");
 const verifyToken = require("../verifyToken");
+const Post = require("../models/Post");
 
 const calculateReadingTime = (content) => {
   const wordsPerMinute = 200;
@@ -18,20 +17,20 @@ router.post("/create", verifyToken, async (req, res) => {
   try {
     const { title, desc, photo, username, userId, categories } = req.body;
     const readingTime = calculateReadingTime(desc);
-    console.log(" reading time", readingTime);
+
     const newPost = new Post({
       title,
       desc,
       photo,
       username,
-      userId,
+      userId: req.userId, // Use req.userId from verifyToken middleware
       categories,
       readingTime,
     });
+
     const savedPost = await newPost.save();
     res.status(200).json(savedPost);
   } catch (err) {
-    console.log(" reading time", readingTime);
     res.status(500).json(err);
   }
 });
@@ -41,13 +40,23 @@ router.put("/:id", verifyToken, async (req, res) => {
   try {
     const { title, desc, photo, username, userId, categories } = req.body;
     const readingTime = calculateReadingTime(desc);
+
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
       {
-        $set: { title, desc, photo, username, userId, categories, readingTime },
+        $set: {
+          title,
+          desc,
+          photo,
+          username,
+          userId: req.userId,
+          categories,
+          readingTime,
+        },
       },
       { new: true }
     );
+
     res.status(200).json(updatedPost);
   } catch (err) {
     res.status(500).json(err);
@@ -58,6 +67,7 @@ router.put("/:id", verifyToken, async (req, res) => {
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
     await Post.findByIdAndDelete(req.params.id);
+    // Also delete associated comments
     await Comment.deleteMany({ postId: req.params.id });
     res.status(200).json("Post has been deleted!");
   } catch (err) {

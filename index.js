@@ -29,7 +29,7 @@ dotenv.config();
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "/images")));
 // app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-// Set up CORS
+//Set up CORS
 const corsOptions = {
   origin:
     "https://blogging-application-f5wlzqejd-shivam-nimjes-projects.vercel.app",
@@ -70,3 +70,4 @@ app.listen(process.env.PORT, () => {
   console.log("app is running on port 5000" + process.env.PORT);
 });
 module.exports = app;
+// help
